@@ -1,0 +1,25 @@
+version: "2"
+
+services:
+  trace-demo:
+    build: .
+    image: tyk/opetracing-demo
+    ports:
+      - "6666:6666"
+  tyk-gateway:
+    image: tykio/tyk-gateway:latest
+    volumes:
+      - ./gw.json:/opt/tyk-gateway/tyk.conf
+      - ./apps:/opt/tyk-gateway/apps
+    depends_on:
+      - jaeger
+      - tyk-redis
+    ports:
+      - "8080:8181"
+  tyk-redis:
+    image: redis:latest
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
