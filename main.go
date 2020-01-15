@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	slog "log"
 	"net/http"
 	"net/http/httputil"
 
 	"github.com/TykTechnologies/tyk/trace"
+	"github.com/opentracing/opentracing-go/log"
 )
 
 type mainHandler struct {
@@ -76,22 +77,22 @@ func main() {
 	var o map[string]interface{}
 	err := json.Unmarshal([]byte(sampleConfig), &o)
 	if err != nil {
-		log.Fatal(err)
+		slog.Fatal(err)
 	}
 
 	trace.SetupTracing("jaeger", o)
 	trace.SetLogger(lg)
 	defer trace.Close()
-	err = trace.AddTracer("jaeger", serviceName)
+	err = trace.AddTracer("", serviceName)
 	if err != nil {
-		log.Fatal(err)
+		slog.Fatal(err)
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/echo", echo)
 	h := mainHandler{h: mux}
-	log.Println("starting trace service at :", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), h))
+	slog.Println("starting trace service at :", port)
+	slog.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), h))
 }
 
 func serveErr(w http.ResponseWriter, err error) {
@@ -101,9 +102,17 @@ func serveErr(w http.ResponseWriter, err error) {
 }
 
 func echo(w http.ResponseWriter, r *http.Request) {
-	span, _ := trace.Span(r.Context(), "echo")
+	span, _ := trace.Span(r.Context(), "echo handler")
 	defer span.Finish()
-	span.LogEvent("received echo ")
+	span.LogFields(
+		log.String("INFO", "step one"),
+	)
+	span.LogFields(
+		log.String("INFO", "step two"),
+	)
+	span.LogFields(
+		log.String("INFO", "step three"),
+	)
 	b, _ := httputil.DumpRequest(r, true)
 	w.Write(b)
 }
