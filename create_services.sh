@@ -4,7 +4,7 @@ API_DEFINITION=$1
 GATEWAY_URL=$2
 
 if [ -n $GATEWAY_URL ]; then
-    GATEWAY_URL="http://localhost:8181"
+    GATEWAY_URL="http://localhost:8080"
 fi
 
 
