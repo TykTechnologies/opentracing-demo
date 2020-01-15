@@ -21,7 +21,7 @@
     },
     "proxy": {
         "listen_path": "/echo",
-        "target_url": "http://trace_1:6666"
+        "target_url": "http://trace-demo:6666"
     },
     "active": true
 }
