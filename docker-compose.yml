@@ -15,7 +15,7 @@ services:
       - jaeger
       - tyk-redis
     ports:
-      - "8080:8181"
+      - "8080:8080"
   tyk-redis:
     image: redis:latest
   jaeger:
